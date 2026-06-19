@@ -73,7 +73,6 @@
 <footer>为第十期赶集会制作 · <a href="about.html">关于这个网站</a></footer>
 
 <script src="data.js"></script>
-<script src="session_quotes.js"></script>
 <script>
 (function() {
   const resultClass = (r) => r.includes('通过') || r.includes('一致同意') ? 'passed' : r.includes('未') ? 'pending' : 'failed';
@@ -86,12 +85,6 @@
         <span>${s.label}</span>
         <span class="date">${s.date} · ${s.presentCount}人在线</span>
       </div>
-      ${(() => {
-        const sq = sessionQuoteData[s.label];
-        return sq && sq.length > 0
-          ? `<div style="background:var(--card-bg);border-radius:8px;padding:10px 16px;margin-bottom:10px;font-size:13px;font-style:italic;border-left:3px solid var(--orange)">${sq.map(q => `<span style="font-weight:700;font-style:normal;color:var(--orange)">${q.name}：</span>${q.quote}`).join('<br>')}</div>`
-          : '';
-      })()}
       ${s.motions.length === 0 ? '<div class="empty">本期无正式动议</div>' : ''}
       ${s.motions.map(m => {
         const avatarUrl = `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(m.proposer)}`;
