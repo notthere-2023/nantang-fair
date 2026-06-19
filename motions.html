@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>动议墙 · 赶集会</title>
+<style>
+  :root {
+    --bg: #fdf6ec; --card-bg: #f7f0e3; --orange: #e57917; --orange2: #ee752c;
+    --yellow: #ffeb3b; --text: #3a2f28; --text-light: #9a8a7a;
+    --green: #5a8a6a; --amber: #c4944a; --grey: #9a8a7a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif; line-height: 1.8; }
+
+  nav {
+    background: var(--bg); border-bottom: 1px solid #e8dcc8; padding: 16px 32px;
+    display: flex; gap: 32px; justify-content: center; position: sticky; top: 0; z-index: 100;
+  }
+  nav a { color: var(--text); text-decoration: none; font-size: 15px; padding: 4px 12px; border-radius: 6px; }
+  nav a:hover { background: var(--yellow); }
+  nav a.current { color: var(--orange); font-weight: 700; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+  h1 { font-size: 28px; margin-bottom: 8px; }
+  .subtitle { color: var(--text-light); margin-bottom: 32px; }
+
+  .session-block { margin-bottom: 40px; }
+  .session-header { font-size: 18px; font-weight: 700; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--orange); display: flex; justify-content: space-between; align-items: baseline; }
+  .session-header .date { font-size: 14px; color: var(--text-light); font-weight: 400; }
+
+  .motion-card {
+    background: #fff; border-radius: 12px; padding: 18px 20px; margin-bottom: 10px;
+    border: 1px solid #e8dcc8; transition: transform 0.15s;
+  }
+  .motion-card:hover { transform: translateY(-2px); box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .motion-card.failed { opacity: 0.7; }
+  .motion-card .card-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .motion-card .card-top img { width: 32px; height: 32px; border-radius: 50%; }
+  .motion-card .proposer { font-weight: 700; font-size: 15px; }
+  .motion-card .content { font-size: 14px; color: var(--text); margin-bottom: 6px; line-height: 1.6; }
+  .tag {
+    display: inline-block; padding: 1px 8px; border-radius: 4px; font-size: 12px;
+    font-weight: 600;
+  }
+  .tag.passed { background: #d4e8d6; color: var(--green); }
+  .tag.pending { background: #f0e0c8; color: var(--amber); }
+  .tag.failed { background: #e8e0d8; color: var(--grey); }
+  .tag.type { background: #fce8d0; color: var(--orange); }
+
+  .empty { color: var(--text-light); font-style: italic; padding: 12px 0; }
+
+  footer { text-align: center; padding: 48px 24px; color: var(--text-light); font-size: 13px; border-top: 1px solid #e8dcc8; }
+  footer a { color: var(--orange); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">首页</a>
+  <a href="motions.html" class="current">动议</a>
+  <a href="people.html">人物</a>
+  <a href="struggles.html">不美丽</a>
+  <a href="about.html">关于</a>
+</nav>
+
+<div class="container">
+  <h1>动议墙</h1>
+  <p class="subtitle">31 项动议，27 项通过。每一次提案都是 <span style="color:var(--orange)">认真讨论</span> 的痕迹。</p>
+  <div id="content"></div>
+</div>
+
+<footer>为第十期赶集会制作 · <a href="about.html">关于这个网站</a></footer>
+
+<script src="data.js"></script>
+<script src="session_quotes.js"></script>
+<script>
+(function() {
+  const resultClass = (r) => r.includes('通过') || r.includes('一致同意') ? 'passed' : r.includes('未') ? 'pending' : 'failed';
+  const resultLabel = (r) => r.includes('通过') || r.includes('一致同意') ? '通过' : r.includes('终止') ? '被终止' : r.includes('未') ? '未决' : r;
+
+  const style = 'open-peeps';
+  document.getElementById('content').innerHTML = siteData.sessions.map(s => `
+    <div class="session-block">
+      <div class="session-header">
+        <span>${s.label}</span>
+        <span class="date">${s.date} · ${s.presentCount}人在线</span>
+      </div>
+      ${(() => {
+        const sq = sessionQuoteData[s.label];
+        return sq && sq.length > 0
+          ? `<div style="background:var(--card-bg);border-radius:8px;padding:10px 16px;margin-bottom:10px;font-size:13px;font-style:italic;border-left:3px solid var(--orange)">${sq.map(q => `<span style="font-weight:700;font-style:normal;color:var(--orange)">${q.name}：</span>${q.quote}`).join('<br>')}</div>`
+          : '';
+      })()}
+      ${s.motions.length === 0 ? '<div class="empty">本期无正式动议</div>' : ''}
+      ${s.motions.map(m => {
+        const avatarUrl = `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(m.proposer)}`;
+        return `
+        <div class="motion-card ${resultClass(m.result) === 'passed' ? '' : 'failed'}">
+          <div class="card-top">
+            <img src="${avatarUrl}" alt="${m.proposer}" loading="lazy"
+                 onerror="this.outerHTML='<div style=\'width:32px;height:32px;border-radius:50%;background:var(--orange);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:14px;font-weight:700\'>${m.proposer[0]}</div>'">
+            <span class="proposer">${m.proposer}</span>
+            <span class="tag type">${m.type}</span>
+            <span class="tag ${resultClass(m.result)}">${resultLabel(m.result)}</span>
+          </div>
+          <div class="content">${m.content}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `).join('');
+})();
+</script>
+
+</body>
+</html>

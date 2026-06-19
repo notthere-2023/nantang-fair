@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人物志 · 赶集会</title>
+<style>
+  :root {
+    --bg: #fdf6ec; --card-bg: #f7f0e3; --orange: #e57917; --orange2: #ee752c;
+    --yellow: #ffeb3b; --text: #3a2f28; --text-light: #9a8a7a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif; line-height: 1.8; }
+
+  nav {
+    background: var(--bg); border-bottom: 1px solid #e8dcc8; padding: 16px 32px;
+    display: flex; gap: 32px; justify-content: center; position: sticky; top: 0; z-index: 100;
+  }
+  nav a { color: var(--text); text-decoration: none; font-size: 15px; padding: 4px 12px; border-radius: 6px; }
+  nav a:hover { background: var(--yellow); }
+  nav a.current { color: var(--orange); font-weight: 700; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+  h1 { font-size: 28px; margin-bottom: 8px; }
+  .subtitle { color: var(--text-light); margin-bottom: 32px; }
+
+  .people-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .person-card {
+    background: #fff; border-radius: 12px; padding: 20px 16px; text-align: center;
+    border: 1px solid #e8dcc8; transition: transform 0.15s; cursor: pointer;
+  }
+  .person-card:hover { transform: translateY(-3px); }
+  .person-card img { width: 72px; height: 72px; border-radius: 50%; margin-bottom: 10px; }
+  .person-card .name { font-weight: 700; font-size: 16px; }
+  .person-card .att { font-size: 13px; color: var(--text-light); margin-top: 2px; }
+  .person-card .ai-label { font-size: 11px; color: var(--text-light); margin-top: 8px; opacity: 0.7; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5); z-index: 200;
+    justify-content: center; align-items: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-card {
+    background: #fff; border-radius: 16px; padding: 40px 32px;
+    max-width: 480px; width: 90%; text-align: center;
+    position: relative; box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+  }
+  .modal-card img { width: 120px; height: 120px; border-radius: 50%; margin-bottom: 16px; }
+  .modal-card .name { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+  .modal-card .att { font-size: 14px; color: var(--text-light); margin-bottom: 16px; }
+  .modal-card .quote-full { font-size: 18px; line-height: 1.8; font-style: italic; color: var(--text); margin-bottom: 8px; }
+  .modal-card .quote-src { font-size: 13px; color: var(--text-light); margin-bottom: 12px; }
+  .modal-close {
+    position: absolute; top: 12px; right: 16px;
+    background: none; border: none; font-size: 24px; cursor: pointer;
+    color: var(--text-light); line-height: 1;
+  }
+  .modal-close:hover { color: var(--text); }
+
+  footer { text-align: center; padding: 48px 24px; color: var(--text-light); font-size: 13px; border-top: 1px solid #e8dcc8; margin-top: 40px; }
+  footer a { color: var(--orange); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">首页</a>
+  <a href="motions.html">动议</a>
+  <a href="people.html" class="current">人物</a>
+  <a href="struggles.html">不美丽</a>
+  <a href="about.html">关于</a>
+</nav>
+
+<div class="container">
+  <h1>人物志</h1>
+  <p class="subtitle">41 位参与者。每个人都有自己的 <span style="color:var(--orange)">讨论</span>。</p>
+  <div class="people-grid" id="grid"></div>
+</div>
+
+<footer>头像由 <a href="https://dicebear.com" target="_blank">DiceBear</a> 生成 · <a href="about.html">关于这个网站</a></footer>
+
+<script src="data.js"></script>
+<script src="quotes.js"></script>
+<script>
+(function() {
+  const style = 'open-peeps';
+  const grid = document.getElementById('grid');
+
+  // Shorten quote for card display
+  function shortQuote(text, max) {
+    if (text.length <= max) return text;
+    for (let p of ['。','？','！','…','，']) {
+      let i = text.lastIndexOf(p, max);
+      if (i > max*0.6) return text.slice(0, i+1);
+    }
+    return text.slice(0, max) + '…';
+  }
+
+  // Build cards
+  grid.innerHTML = siteData.people.map(p => {
+    const url = `https://api.dicebear.com/9.x/${style}/svg?seed=${encodeURIComponent(p.name)}`;
+    const q = quoteData[p.name];
+    const quoteHtml = q && q.quote
+      ? `<div class="quote-preview" style="font-size:13px;color:var(--text);margin-top:8px;line-height:1.5;font-style:italic">"${shortQuote(q.quote, 60)}"</div>`
+      : '';
+    return `
+      <div class="person-card" data-name="${p.name}">
+        <img src="${url}" alt="${p.name}" loading="lazy"
+             onerror="this.outerHTML='<div style=\'width:72px;height:72px;border-radius:50%;background:var(--orange);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin:0 auto 10px\'>'+p.name[0]+'</div>'">
+        <div class="name">${p.name}</div>
+        <div class="att">出席 ${p.attendedCount} 次</div>
+        ${quoteHtml}
+        <div class="ai-label">🤖 AI 辅助筛选引语</div>
+      </div>
+    `;
+  }).join('');
+
+  // Add modal to DOM
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'modal';
+  modal.innerHTML = `
+    <div class="modal-card">
+      <button class="modal-close">&times;</button>
+      <img id="modal-img" src="" alt="">
+      <div class="name" id="modal-name"></div>
+      <div class="att" id="modal-att"></div>
+      <div class="quote-full" id="modal-quote"></div>
+      <div class="quote-src" id="modal-src"></div>
+      <div class="ai-label">🤖 AI 辅助筛选引语</div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // Click handlers
+  grid.addEventListener('click', function(e) {
+    const card = e.target.closest('.person-card');
+    if (!card) return;
+    const name = card.dataset.name;
+    const p = siteData.people.find(x => x.name === name);
+    if (!p) return;
+    const q = quoteData[name];
+    const img = card.querySelector('img');
+    document.getElementById('modal-img').src = img ? img.src : '';
+    document.getElementById('modal-name').textContent = p.name;
+    document.getElementById('modal-att').textContent = `出席 ${p.attendedCount} 次`;
+    document.getElementById('modal-quote').textContent = q && q.quote ? `"${q.quote}"` : '';
+    document.getElementById('modal-src').textContent = q && q.session ? `—— ${q.session}` : '';
+    modal.classList.add('active');
+  });
+
+  // Close: click overlay background or X button
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal || e.target.classList.contains('modal-close')) {
+      modal.classList.remove('active');
+    }
+  });
+
+  // Close: press Esc
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') modal.classList.remove('active');
+  });
+})();
+</script>
+
+</body>
+</html>

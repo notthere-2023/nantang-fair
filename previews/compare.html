@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DiceBear 风格对比</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #fdf6ec; padding: 40px; }
+  h1 { color: #3a2f28; }
+  .grid { display: flex; flex-wrap: wrap; gap: 30px; }
+  .card { background: #fff; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .card img { width: 120px; height: 120px; border-radius: 50%; }
+  .card h3 { margin: 10px 0 5px; color: #3a2f28; }
+  .card p { margin: 0; color: #9a8a7a; font-size: 14px; }
+  .label { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin-top: 6px; }
+  .recommend { background: #e57917; color: #fff; }
+</style>
+</head>
+<body>
+<h1>DiceBear 头像风格对比</h1>
+<p>种子名（seed）：跳跳 | 点击风格名可看原图</p>
+<div class="grid" id="grid"></div>
+<script>
+const styles = [
+  { name: 'open-peeps', desc: '手绘人物，温暖社区' },
+  { name: 'micah', desc: '极简肖像，柔和细腻' },
+  { name: 'fun-emoji', desc: '表情符号，活泼' },
+  { name: 'lorelei', desc: '艺术感角色' },
+  { name: 'croodles', desc: '涂鸦风，线条随意' },
+  { name: 'avataaars', desc: '卡通角色' },
+  { name: 'bottts', desc: '几何机器人' },
+  { name: 'pixel-art', desc: '像素艺术' },
+  { name: 'personas', desc: '专业感角色' },
+];
+const grid = document.getElementById('grid');
+styles.forEach(s => {
+  const url = `https://api.dicebear.com/9.x/${s.name}/svg?seed=跳跳`;
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <a href="${url}" target="_blank"><img src="${url}" alt="${s.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22><text x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22>加载失败</text></svg>'"></a>
+    <h3>${s.name}</h3>
+    <p>${s.desc}</p>
+  `;
+  grid.appendChild(card);
+});
+</script>
+</body>
+</html>

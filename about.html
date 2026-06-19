@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关于 · 赶集会</title>
+<style>
+  :root {
+    --bg: #fdf6ec; --card-bg: #f7f0e3; --orange: #e57917; --orange2: #ee752c;
+    --yellow: #ffeb3b; --text: #3a2f28; --text-light: #9a8a7a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, "Microsoft YaHei", "PingFang SC", sans-serif; line-height: 1.8; }
+
+  nav {
+    background: var(--bg); border-bottom: 1px solid #e8dcc8; padding: 16px 32px;
+    display: flex; gap: 32px; justify-content: center; position: sticky; top: 0; z-index: 100;
+  }
+  nav a { color: var(--text); text-decoration: none; font-size: 15px; padding: 4px 12px; border-radius: 6px; }
+  nav a:hover { background: var(--yellow); }
+  nav a.current { color: var(--orange); font-weight: 700; }
+
+  .container { max-width: 700px; margin: 0 auto; padding: 40px 24px; }
+  h1 { font-size: 28px; margin-bottom: 24px; }
+  h2 { font-size: 18px; margin: 32px 0 12px; color: var(--orange); }
+  p { margin-bottom: 12px; }
+  .section { margin-bottom: 32px; }
+  .note { background: var(--card-bg); border-radius: 8px; padding: 16px 20px; font-size: 14px; border: 1px solid #e8dcc8; }
+
+  footer { text-align: center; padding: 48px 24px; color: var(--text-light); font-size: 13px; border-top: 1px solid #e8dcc8; margin-top: 40px; }
+  footer a { color: var(--orange); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html">首页</a>
+  <a href="motions.html">动议</a>
+  <a href="people.html">人物</a>
+  <a href="struggles.html">不美丽</a>
+  <a href="about.html" class="current">关于</a>
+</nav>
+
+<div class="container">
+  <h1>关于这个网站</h1>
+
+  <div class="section">
+    <h2>赶集会是什么</h2>
+    <p>赶集会是南塘云村的一个定期公众集会，由富章发起和主持。从 2026 年 3 月到 6 月，每十天一次（10号、20号、30号），在 iMeeting 线上进行。自由讨论，民主决议——任何人都可以发言、提问、提出动议。</p>
+    <p>到第十期，赶集会已经走过了一个季度。这个网站整理了前九期的会议记录：谁来过、讨论了什么、决定了什么。</p>
+  </div>
+
+  <div class="section">
+    <h2>这个网站的来历</h2>
+    <p>为第十期赶集会制作。送给富章哥的一份礼物——感谢他一季度的努力。</p>
+    <p>把散落在文件里的九期会议记录变成可以看、可以回溯的东西。看看这些信息被捞出来、放在一起之后，会生成什么新的意义。</p>
+    <p>也是一个学习的过程——尝试把生活中的问题转化为可编程的问题，在这个过程中学习技术。</p>
+    <p>想要呼应富章哥在第十期通知里关于合作的话：合作意味着什么？需要妥协吗？分歧时继续还是分手？</p>
+  </div>
+
+  <div class="section">
+    <h2>关于 AI</h2>
+    <div class="note">
+      <p>🤖 本网站的制作过程中使用了 AI 辅助：</p>
+      <p>· 数据提取——从会议纪要 Markdown 文件中提取结构化信息<br>
+      · 代码编写——HTML / CSS / JavaScript 页面搭建<br>
+      · 人物头像——由 <a href="https://dicebear.com" target="_blank">DiceBear</a>（开源头像库）生成</p>
+      <p style="margin-top:8px;font-size:13px;color:var(--text-light)">所有内容数据均来自赶集会会议记录原文。AI 处理的内容已经过人工审核。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>技术</h2>
+    <p>纯静态网页——HTML + CSS + 一点点 JavaScript。没有框架，没有后端，浏览器直接打开就能看。代码和数据可随时修改。</p>
+  </div>
+</div>
+
+<footer>
+  <p>2026 年 6 月 20 日 · 第十期赶集会</p>
+</footer>
+
+</body>
+</html>
